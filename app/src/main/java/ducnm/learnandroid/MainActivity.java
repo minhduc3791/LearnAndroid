@@ -16,6 +16,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 
@@ -34,9 +38,8 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(android.R.id.list);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
         listView.setAdapter(adapter);
+        getData();
 
-        data.add("pikachu");
-        adapter.notifyDataSetChanged();
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getData(){
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://thandongamnhac.vn/binhchon/export.php?offset=0";
+        String url ="http://thandongamnhac.vn/binhchon/export.php?offset=" + preLast;
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -75,8 +78,17 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        Log.d("Log sucess", "onResponse: " + response);
-                        data.add(response);
+
+                        try {
+                            JSONArray datas = new JSONArray(response);
+
+                            // Getting JSON Array node
+                            for(int i = 0 ; i < datas.length() ; i++){
+                                data.add(datas.getJSONObject(i).getString("email"));
+                            }
+                        } catch (JSONException e){
+
+                        }
                         adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
