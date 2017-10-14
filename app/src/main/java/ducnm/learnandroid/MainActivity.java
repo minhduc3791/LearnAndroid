@@ -3,18 +3,9 @@ package ducnm.learnandroid;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,36 +59,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getData(){
-        RequestQueue queue = Volley.newRequestQueue(this);
+    private void getData() {
         String url ="http://thandongamnhac.vn/binhchon/export.php?offset=" + preLast;
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
+        OnPostExUpdateListview onPostExUpdateListview = new OnPostExUpdateListview();
+        onPostExUpdateListview.setListView(data);
+        onPostExUpdateListview.setAdapter(adapter);
 
-                        try {
-                            JSONArray datas = new JSONArray(response);
-
-                            // Getting JSON Array node
-                            for(int i = 0 ; i < datas.length() ; i++){
-                                data.add(datas.getJSONObject(i).getString("email"));
-                            }
-                        } catch (JSONException e){
-
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Log error", "That didn't work!");
-            }
-        });
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+        IHTTPRequest ihttpRequest = new IHTTPRequest();
+        ihttpRequest.setiOnPostEx(onPostExUpdateListview);
+        ihttpRequest.execute(url);
     }
 }
